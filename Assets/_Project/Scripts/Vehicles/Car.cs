@@ -42,15 +42,26 @@ public class Car : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (_allWheelsGrounded)
+        var accPerWheel = Acceleration / (float)Wheels.Length;
+
+        for (var i = 0; i < Wheels.Length; i++)
         {
+            if (!_grounded[i]) continue;
+
+            var point = Wheels[i].transform.position;
+            var forward = Wheels[i].transform.forward;
+
             if (Input.Brake > 0f)
             {
-                Rigidbody.AddRelativeForce(-Vector3.forward * Acceleration * Input.Brake * Rigidbody.mass);
+                Rigidbody.AddForceAtPosition(
+                    -forward * accPerWheel * Input.Brake * Rigidbody.mass,
+                    point);
             }
             else
             {
-                Rigidbody.AddRelativeForce(Vector3.forward * Acceleration * Input.Gas * Rigidbody.mass);
+                Rigidbody.AddForceAtPosition(
+                    forward * accPerWheel * Input.Gas * Rigidbody.mass,
+                    point);
             }
         }
 
@@ -70,6 +81,8 @@ public class Car : MonoBehaviour
         {
             var wheel = Wheels[i];
             if (!_grounded[i]) continue;
+
+            // TODO: handbrake
 
             var right = wheel.transform.right;
             var point = wheel.transform.position;
